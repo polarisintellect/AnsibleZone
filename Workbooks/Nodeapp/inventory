@@ -1,5 +1,8 @@
+[all]
+ip-10-1-1-37.ec2.internal
+
 [web]
-ip-172-31-33-115.us-west-2.compute.internal
+ip-10-1-1-35.ec2.internal
 
 [app]
-ip-172-31-41-121.us-west-2.compute.internal
+ip-10-1-1-245.ec2.internal

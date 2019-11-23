@@ -14,7 +14,7 @@
   vars:
     folderpath: /home/ansible/nodesetup
     appserverport: 8080
-    app_ip: 172.31.41.121
+    app_ip: 10.1.1.245
   tasks:
   - name: Creating nodesetup directory
     file:
@@ -43,8 +43,8 @@
 - hosts: web
   become: yes
   vars:
-    webserver_dns_name: "ec2-54-213-64-143.us-west-2.compute.amazonaws.com"
-    appserver_ip: 172.31.41.121
+    webserver_dns_name: "ec2-54-162-189-99.compute-1.amazonaws.com"
+    appserver_ip: 10.1.1.245
   tasks:
   - name: install nginx
     apt:
