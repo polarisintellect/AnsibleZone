@@ -1,0 +1,67 @@
+- name: get_istio | Set the 'latest' Istio release
+  set_fact:
+    # https://api.github.com/repos/istio/istio/releases/latest
+    istio_release_url: "{{ __i.repo.github_url }}/{{ __i.repo.name }}/releases/latest"
+
+- name: get_istio | Set the 'tagged' Istio release
+  set_fact:
+    # https://api.github.com/repos/istio/istio/releases/tags/0.2.7
+    istio_release_url: "{{ __i.repo.github_url }}/{{ __i.repo.name }}/releases/tags/{{ __i.repo.release_tag_name }}"
+  when: __i.repo.release_tag_name != ''
+
+- name: get_istio | Query the '{{ istio_release_url }}'
+  uri:
+    url: "{{ istio_release_url }}"
+  register: istio_release
+
+- name: get_istio | Set OS fact as 'linux'
+  set_fact:
+    istio_os: "linux"
+  when: ansible_system == "Linux"
+
+- name: get_istio | Set OS fact as 'win'
+  set_fact:
+    istio_os: "win"
+  when: ansible_system == "Windows"
+
+- name: get_istio | Set OS fact as 'osx'
+  set_fact:
+    istio_os: "osx"
+  when: ansible_system == "Darwin"
+
+## 'jmespath' is required: $ pip install jmespath
+- name: get_istio | Get Istio asset details from the json response
+  set_fact:
+    istio_asset_url: "{{ item.browser_download_url }}"
+    istio_asset_name: "{{ item.name }}"
+    istio_asset_name_without_ext: "{{ item.name | regex_replace('^(.+).tar.gz$', '\\1') }}"
+  with_items: "{{ istio_release.json | json_query(my_query) }}"
+  vars:
+    my_query: "assets[?name=='istio-{{ istio_release.json.tag_name }}-{{ istio_os }}.tar.gz']"
+
+- name: get_istio | Updating 'istio_release_tag_name' with Istio Tag Name
+  set_fact:
+    istio_release_tag_name: "{{ istio_release.json.tag_name  }}"
+
+- name: get_istio | Create '{{ istio_asset_name_without_ext }}' dir to unarchive
+  file:
+    path: "{{ __i.dir.local_repo }}/{{ istio_asset_name_without_ext }}"
+    state: directory
+    recurse: yes
+
+- name: get_istio | Download the asset for Istio
+  get_url:
+    url: "{{ istio_asset_url }}"
+    dest: "{{ __i.dir.local_repo }}/{{ istio_asset_name }}"
+
+- name: get_istio | Unzip the archive
+  command: "unzip {{ __i.dir.local_repo }}/{{ istio_asset_name }} -d {{ __i.dir.local_repo }}/{{ istio_asset_name_without_ext }}"
+  args:
+    creates: "{{ __i.dir.local_repo }}/{{ istio_asset_name_without_ext }}/istio-{{ istio_release_tag_name }}/bin/istioctl"
+  when: istio_asset_name | regex_search('zip$')
+
+- name: get_istio | Untar the archive
+  command: "tar -xvzf {{ __i.dir.local_repo }}/{{ istio_asset_name }} -C {{ __i.dir.local_repo }}/{{ istio_asset_name_without_ext }}"
+  args:
+    creates: "{{ __i.dir.local_repo }}/{{ istio_asset_name_without_ext }}/istio-{{ istio_release_tag_name }}/bin/istioctl"
+  when: istio_asset_name | regex_search('tar.gz$')

@@ -1,0 +1,136 @@
+
+# Gopkg.toml example
+#
+# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
+# for detailed Gopkg.toml documentation.
+#
+# required = ["github.com/user/thing/cmd/thing"]
+# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+#
+# [[constraint]]
+#   name = "github.com/user/project"
+#   version = "1.0.0"
+#
+# [[constraint]]
+#   name = "github.com/user/project2"
+#   branch = "dev"
+#   source = "github.com/myfork/project2"
+#
+# [[override]]
+#  name = "github.com/x/y"
+#  version = "2.4.0"
+
+# TODO: fork the repo to checkin artifacts, or find an alternative repo that has artifacts available.
+# This repo includes only istio-generated files.
+
+### BEGIN Mixer codegen deps
+
+required = [
+  "github.com/gogo/protobuf/proto",
+  "github.com/gogo/protobuf/jsonpb",
+  "github.com/gogo/protobuf/protoc-gen-gogoslick",
+  "github.com/gogo/protobuf/gogoproto",
+]
+
+### END Mixer codegen deps
+
+[[constraint]]
+  name = "github.com/googleapis/googleapis"
+  source = "https://github.com/costinm/googleapis.git"
+
+[[constraint]]
+  name = "google.golang.org/grpc"
+  version = "^1.8.2" # match istio/api
+
+
+# When necessary, override transitive contraints that might be pinned
+# to older versions (e.g. ingress-nginx pinned to 1.8).
+#
+# kubernetes has a quarterly release cycle. For now the k8s
+# dependencies below follow this convention, but that could possibly
+# change in the future as repos are further decoupled from
+# kubernetes/kubernetes proper.
+#
+# client-go release-6.0 corresponds to k8s release-1.9 branch. See
+# https://github.com/kubernetes/client-go/tree/release-6.0#compatibility-matrix
+# for details.
+[[override]]
+  name = "k8s.io/client-go"
+  branch = "release-6.0"
+
+[[override]]
+  name = "k8s.io/apimachinery"
+  branch = "release-1.9"
+
+[[override]]
+  name = "k8s.io/api"
+  branch = "release-1.9"
+
+[[constraint]]
+  name = "k8s.io/apiextensions-apiserver"
+  branch = "release-1.9"
+
+[[constraint]]
+  name = "k8s.io/apiserver"
+  branch = "release-1.9"
+
+# TODO(https://github.com/istio/istio/issues/2413). Keep
+# k8s.io/ingress-nginx pinned to an older version until istio ingress code
+# is refactored.
+#
+# istio.io/istio/pilot/adapter/config/ingress uses the following nginx
+# controller packages from an older version of k8s.io/ingress which
+# have since been made internal and are no longer available.
+#
+#     "k8s.io/ingress-nginx/core/pkg/ingress/status"
+#     "k8s.io/ingress-nginx/core/pkg/ingress/store"
+#     "k8s.io/ingress-nginx/core/pkg/ingress/annotations/class"
+[[constraint]]
+  name = "k8s.io/ingress-nginx"
+  revision = "0c6f15e372c831de52fcc393932540bb3a6d51b5"
+
+[[constraint]]
+  name = "github.com/russross/blackfriday"
+  revision = "4048872b16cc0fc2c5fd9eacf0ed2c2fedaa0c8c"
+
+[[constraint]]
+  name = "code.cloudfoundry.org/copilot"
+  revision = "b311fd6188b8f4f75cfe4c692692732e06b74fc3"
+
+[[override]]
+  name = "github.com/ugorji/go"
+  revision = "708a42d246822952f38190a8d8c4e6b16a0e600c"
+
+[[override]]
+ name = "github.com/apache/thrift"
+ version = ">=0.9.3, <0.11.0"
+
+[[constraint]]
+  name = "istio.io/fortio"
+  version = ">= v0.6.4"
+
+### DO NOT PIN these repos to master. It will result in inconsistent builds in circleci
+### as we cache dep ensure.
+[[constraint]]
+  name = "istio.io/api"
+  revision = "a6c74ca9a8b5bba45bafd6d238a27dde4c406da7"
+
+[[constraint]]
+  name = "github.com/envoyproxy/go-control-plane"
+  revision = "cd217031c55a80342a864f9aff3b7a7f22205891"
+
+### Begin Mixer codegen dep pinning
+
+[[override]]
+  name = "github.com/gogo/protobuf"
+  version = "=0.5"
+
+### End Mixer codegen dep pinning
+
+[[constraint]]
+  name = "github.com/open-policy-agent/opa"
+  version = "0.5.13"
+
+[[constraint]]
+  name = "github.com/onsi/gomega"
+  revision = "ba3724c94e4dd5d5690d37c190f1c54b2c1b4e64"
