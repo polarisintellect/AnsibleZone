@@ -16,11 +16,11 @@
    # chdir: "{{ temp_output.stdout }}"
   #when: asset_name | search('zip')
 
-- name: Untar the archive
-  command: "tar -xvzf {{ asset_name }} -C {{ istio.dest }}"
-  args:
-    chdir: "{{ temp_output.stdout }}"
-  when: asset_name | search('tar.gz')
+#- name: Untar the archive
+ # command: "tar -xvzf {{ asset_name }} -C {{ istio.dest }}"
+  #args:
+   # chdir: "{{ temp_output.stdout }}"
+  #when: asset_name | search('tar.gz')
 
 - name: Remove the temp directory
   file:
