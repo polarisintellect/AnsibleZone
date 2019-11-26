@@ -1,5 +1,5 @@
 # from galaxy for redis server
-- src: jpnewman.redis
+- src: chilcano.minishift
 
 # from galaxy for mongo db
-- src: nsops.mongodb
+- src: chilcano.istio
